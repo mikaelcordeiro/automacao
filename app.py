@@ -19,9 +19,14 @@ def leitura(file):
 
 def list_date(label):
 
-    dates = st.sidebar.select_slider(label, options=[dt.strftime("%d/%m") for dt in daterange(date(2020, 8, 1), date(2020, 12, 31))])
+    dates = st.sidebar.select_slider(label, options=[dt.strftime("%d/%m/%Y") for dt in daterange(date(2020, 8, 1), date(2020, 12, 31))])
 
     return dates
+
+
+def date_datetime(date):
+
+    return pd.to_datetime(date, errors='coerce', format='%d/%m/%Y')
 
 
 def progresso(tempo=.13):
@@ -36,6 +41,14 @@ def progresso(tempo=.13):
 def daterange(date1, date2):
     for n in range(int((date2 - date1).days)+1):
         yield date1 + timedelta(n)
+
+
+def retirando_datas(dataframe: pd.DataFrame):
+    datas = [i[-10:] for i in dataframe]
+
+    datas = pd.Series(datas, name='Datas')
+
+    return pd.to_datetime(datas, errors='coerce', format='%d/%m/%Y')
 
 
 def dashboard():
@@ -54,13 +67,25 @@ def dashboard():
 
     data_um = list_date("Data Final")
 
+    data_zero_datetime = date_datetime(data_zero)
+
+    data_um_datetime = date_datetime(data_um)
+
     file = st.sidebar.file_uploader('Arraste a planilha, ou clique em "browse files"')
 
     if file is not None:
 
-        leitura(file)
+        df = leitura(file)
 
-        progresso()
+#        progresso()
+
+        datas = retirando_datas(df['Conteúdo'])
+
+        df = df.join(datas)
+
+        df = df[df["Datas"].between(data_zero_datetime, data_um_datetime)]
+
+        st.dataframe(df)
 
 
 if __name__ == '__main__':
