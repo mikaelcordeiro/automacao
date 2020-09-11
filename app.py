@@ -85,7 +85,10 @@ def dashboard():
 
         df = df[df["Datas"].between(data_zero_datetime, data_um_datetime)]
 
-        st.dataframe(df)
+        disciplinas = st.sidebar.multiselect('Selecione as disciplinas desejadas',
+                                     df['Caderno'].unique())
+
+        st.dataframe(df[(df['Caderno'].isin(disciplinas) & (df['Status da seção'] == 'aberta'))])
 
 
 if __name__ == '__main__':
