@@ -11,14 +11,12 @@ def config():
 
 @st.cache(suppress_st_warning=True)
 def leitura(file):
-
     df = pd.read_excel(file, header=0, usecols="A, D, F, G, I, M, N, S")
 
     return df
 
 
 def list_date(label):
-
     dates = st.sidebar.select_slider(label, options=[dt.strftime("%d/%m/%Y") for dt in daterange(date(2020, 8, 1), date(2020, 12, 31))])
 
     return dates
@@ -30,7 +28,6 @@ def date_datetime(date):
 
 
 def progresso(tempo=.13):
-
     bar = st.sidebar.progress(0)
 
     for i in range(100):
@@ -49,6 +46,20 @@ def retirando_datas(dataframe: pd.DataFrame):
     datas = pd.Series(datas, name='Datas')
 
     return pd.to_datetime(datas, errors='coerce', format='%d/%m/%Y')
+
+
+def tipos_de_atividade(df: pd.DataFrame, disciplinas: list):
+    atividades_por_materia = dict()
+
+    selecionadas_por_materia = dict()
+
+    for materia in disciplinas:
+        atividades_por_materia[materia] = df[df['Caderno'] == materia]['Tipo do conteúdo'].unique()
+
+        selecionadas_por_materia[materia] = st.multiselect(f'Selecione os tipos de conteúdo desejados de {materia}',
+                                                           atividades_por_materia[materia])
+
+    return selecionadas_por_materia
 
 
 def dashboard():
@@ -88,7 +99,13 @@ def dashboard():
         disciplinas = st.sidebar.multiselect('Selecione as disciplinas desejadas',
                                      df['Caderno'].unique())
 
-        st.dataframe(df[(df['Caderno'].isin(disciplinas) & (df['Status da seção'] == 'aberta'))])
+        df = df[(df['Caderno'].isin(disciplinas) & (df['Status da seção'] == 'aberta'))]
+
+        tipos_selecionados = tipos_de_atividade(df, disciplinas)
+
+        if st.button('Gerar Tabela'):
+
+            tipos_selecionados
 
 
 if __name__ == '__main__':
