@@ -17,7 +17,7 @@ def leitura(file):
 
 
 def list_date(label):
-    dates = st.sidebar.select_slider(label, options=[dt.strftime("%d/%m/%Y") for dt in daterange(date(2020, 8, 1), date(2020, 12, 31))])
+    dates = st.sidebar.select_slider(label, options=[dt.strftime("%d/%m/%Y") for dt in daterange(date(2020, 2, 1), date(2020, 12, 31))])
 
     return dates
 
@@ -48,7 +48,7 @@ def retirando_datas(dataframe: pd.DataFrame):
     return pd.to_datetime(datas, errors='coerce', format='%d/%m/%Y')
 
 
-def tipos_de_atividade(df: pd.DataFrame, disciplinas: list):
+def tipos_de_atividade(df: pd.DataFrame, disciplinas: list) -> dict:
     atividades_por_materia = dict()
 
     selecionadas_por_materia = dict()
