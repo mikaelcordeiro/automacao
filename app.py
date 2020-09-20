@@ -105,7 +105,30 @@ def dashboard():
 
         if st.button('Gerar Tabela'):
 
-            tipos_selecionados
+            st.subheader(f'Tabela de Progresso entre as datas {data_zero} - {data_um}')
+
+            tabela = pd.DataFrame(index=df['Aluno'].unique())
+
+            for materia in tipos_selecionados.keys():
+
+                notas = list()
+
+                for aluno in df['Aluno'].unique():
+
+                    medias_do_aluno = list()
+
+                    for selecionado in tipos_selecionados[materia]:
+                        media = df[(df['Caderno'] == materia)
+                                   & (df['Tipo do conteúdo'] == selecionado)
+                                   & (df['Aluno'] == aluno)]['Progresso'].mean()
+
+                        medias_do_aluno.append(media)
+
+                    notas.append(max(medias_do_aluno))
+
+                tabela[materia] = notas
+
+            tabela
 
 
 if __name__ == '__main__':
