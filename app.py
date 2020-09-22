@@ -62,6 +62,18 @@ def tipos_de_atividade(df: pd.DataFrame, disciplinas: list) -> dict:
     return selecionadas_por_materia
 
 
+def resumo_disciplinas(dados: pd.DataFrame) -> pd.DataFrame:
+    media_disciplina = dados.mean(axis=0).round(2)
+
+    numero_acessos = dados[dados != 0].count(axis=0)
+
+    tabela = pd.DataFrame(columns=media_disciplina.index,
+                          data=[media_disciplina.values, numero_acessos],
+                          index=['Média de Acesso por Caderno', 'Número de Acesso por Caderno '])
+
+    return tabela
+
+
 def dashboard():
 
     config()
@@ -127,6 +139,12 @@ def dashboard():
                     notas.append(max(medias_do_aluno))
 
                 tabela[materia] = notas
+
+            tabela['Média Total'] = tabela.mean(axis=1)
+
+            tabela_dois = resumo_disciplinas(tabela)
+
+            tabela = tabela.append(tabela_dois.iloc[:, :])
 
             tabela
 
