@@ -1,11 +1,10 @@
+import time
 import streamlit as st
 import pandas as pd
-import time
 from datetime import timedelta, date
 
 
 def config():
-
     return st.set_option('deprecation.showfileUploaderEncoding', False)
 
 
@@ -17,13 +16,13 @@ def leitura(file):
 
 
 def list_date(label):
-    dates = st.sidebar.select_slider(label, options=[dt.strftime("%d/%m/%Y") for dt in daterange(date(2020, 2, 1), date(2020, 12, 31))])
+    dates = st.sidebar.select_slider(label, options=[dt.strftime("%d/%m/%Y") for dt in
+                                                     daterange(date(2020, 2, 1), date(2020, 12, 31))])
 
     return dates
 
 
 def date_datetime(date):
-
     return pd.to_datetime(date, errors='coerce', format='%d/%m/%Y')
 
 
@@ -36,7 +35,7 @@ def progresso(tempo=.13):
 
 
 def daterange(date1, date2):
-    for n in range(int((date2 - date1).days)+1):
+    for n in range(int((date2 - date1).days) + 1):
         yield date1 + timedelta(n)
 
 
@@ -75,7 +74,6 @@ def resumo_disciplinas(dados: pd.DataFrame) -> pd.DataFrame:
 
 
 def dashboard():
-
     config()
 
     st.title('Associação Marie Curie Vestibulares')
@@ -100,7 +98,7 @@ def dashboard():
 
         df = leitura(file)
 
-#        progresso()
+        #        progresso()
 
         datas = retirando_datas(df['Conteúdo'])
 
@@ -109,7 +107,7 @@ def dashboard():
         df = df[df["Datas"].between(data_zero_datetime, data_um_datetime)]
 
         disciplinas = st.sidebar.multiselect('Selecione as disciplinas desejadas',
-                                     df['Caderno'].unique())
+                                             df['Caderno'].unique())
 
         df = df[(df['Caderno'].isin(disciplinas) & (df['Status da seção'] == 'aberta'))]
 
@@ -148,7 +146,13 @@ def dashboard():
 
             tabela
 
+            if st.button('teste'):
+
+                tabela.to_excel(f'~/Downloads/{date.day}_{date.month}_{date.year}.xlsx',
+                         sheet_name='Análise Pedagógico',
+                         index=True,
+                         float_format='%.2f')
+
 
 if __name__ == '__main__':
-
     dashboard()
