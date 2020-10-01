@@ -1,4 +1,5 @@
 import time
+import base64
 import streamlit as st
 import pandas as pd
 from datetime import timedelta, date
@@ -71,6 +72,13 @@ def resumo_disciplinas(dados: pd.DataFrame) -> pd.DataFrame:
                           index=['Média de Acesso por Caderno', 'Número de Acesso por Caderno '])
 
     return tabela
+
+
+def downloader(df: pd.DataFrame):
+    csv = df.to_csv(index=True)
+    b64 = base64.b64encode(csv.encode()).decode()
+    href = f"<a href='data:file/csv;base64,{b64}'>Aperte aqui para baixar a tabela em formato .csv</a>"
+    return href
 
 
 def dashboard():
@@ -146,12 +154,7 @@ def dashboard():
 
             tabela
 
-            if st.button('teste'):
-
-                tabela.to_excel(f'~/Downloads/{date.day}_{date.month}_{date.year}.xlsx',
-                         sheet_name='Análise Pedagógico',
-                         index=True,
-                         float_format='%.2f')
+            st.markdown(downloader(tabela), unsafe_allow_html=True)
 
 
 if __name__ == '__main__':
