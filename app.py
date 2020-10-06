@@ -2,6 +2,7 @@ import time
 import base64
 import streamlit as st
 import pandas as pd
+from banco_dados import banco
 from datetime import timedelta, date
 
 
@@ -155,6 +156,12 @@ def dashboard():
             tabela
 
             st.markdown(downloader(tabela), unsafe_allow_html=True)
+
+            st.subheader('Tabela de Médias Totais')
+
+            banco.producao_banco(media_total=tabela['Média Total'].tolist()[:-2], alunos=df['Aluno'].unique().tolist())
+
+            st.markdown(banco.gerar_df())
 
 
 if __name__ == '__main__':
