@@ -1,4 +1,7 @@
 import sqlite3
+import time
+import streamlit as st
+import pandas as pd
 
 
 def producao_banco(alunos: list, media_total: list):
@@ -17,20 +20,70 @@ def producao_banco(alunos: list, media_total: list):
     try:
 
         for y, x in enumerate(alunos):
+
             cursor.execute(f"""INSERT INTO medias_totais (ID, Aluno) VALUES ('{y}', '{x}')""")
 
     except:
 
-        'Alunos já preenchidos :)'
+        with st.spinner('Alunos já preenchidos :smile:'):
 
-    return banco.commit()
+            time.sleep(1.3)
+
+    finally:
+
+        return banco.commit()
 
 
-def gerar_df() -> list:
+def gerar_df() -> pd.DataFrame:
     banco = sqlite3.connect('banco_dados/teste.db')
 
     cursor = banco.cursor()
 
     cursor.execute("""SELECT * FROM medias_totais""")
 
-    return cursor.fetchall()
+    colunas_banco = [i[0] for i in cursor.description]
+
+    df_banco = pd.DataFrame(cursor.fetchall(), columns=colunas_banco).drop(columns=['ID']).set_index('Aluno')
+
+    try:
+
+        df_banco['Evolucao'] = (df_banco[colunas_banco[-1]] / df_banco[colunas_banco[-2]]) - 1
+
+    except:
+
+        with st.spinner('Teremos o indicador "Evolução" quando mais de um intervalo de dias for analisado :wink:'):
+
+            time.sleep(1.3)
+
+    finally:
+
+        return df_banco
+
+
+def adiciona_media_geral(media_total: list, data_inicial, data_final):
+    banco = sqlite3.connect('banco_dados/teste.db')
+
+    cursor = banco.cursor()
+
+    try:
+
+        cursor.execute(
+            f"""ALTER TABLE medias_totais ADD COLUMN '{data_inicial}-{data_final}' DECIMAL(1,4)""")
+
+        for i, media in enumerate(media_total):
+
+            cursor.execute(f"""UPDATE medias_totais 
+
+                                set '{data_inicial}-{data_final}' = {media} 
+
+                                where ID = {i}""")
+
+    except:
+
+        with st.spinner('Esse intervalo de datas já existe no banco de dados :stuck_out_tongue:'):
+
+            time.sleep(1.3)
+
+    finally:
+
+        return banco.commit()
