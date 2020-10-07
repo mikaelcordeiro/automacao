@@ -75,10 +75,10 @@ def resumo_disciplinas(dados: pd.DataFrame) -> pd.DataFrame:
     return tabela
 
 
-def downloader(df: pd.DataFrame):
+def downloader(df: pd.DataFrame, texto: str):
     csv = df.to_csv(index=True)
     b64 = base64.b64encode(csv.encode()).decode()
-    href = f"<a href='data:file/csv;base64,{b64}'>Aperte aqui para baixar a tabela em formato .csv</a>"
+    href = f"<a href='data:file/csv;base64,{b64}'>{texto}</a>"
     return href
 
 
@@ -153,15 +153,23 @@ def dashboard():
 
             tabela = tabela.append(tabela_dois.iloc[:, :])
 
-            tabela
+            tabela  # colocar cor aqui
 
-            st.markdown(downloader(tabela), unsafe_allow_html=True)
+            st.markdown(downloader(tabela, texto='Aperte aqui para baixar a tabela em formato .csv'),
+                        unsafe_allow_html=True)
 
-            st.subheader('Tabela de Médias Totais')
+            st.subheader('Tabela de Médias Totais e Evolução das semanas analisadas')
 
             banco.producao_banco(media_total=tabela['Média Total'].tolist()[:-2], alunos=df['Aluno'].unique().tolist())
 
-            st.markdown(banco.gerar_df())
+            banco.adiciona_media_geral(media_total=tabela['Média Total'].tolist()[:-2], data_inicial=data_zero, data_final=data_um)
+
+            df_banco = banco.gerar_df()
+
+            df_banco  # colocar cor aqui
+
+            st.markdown(downloader(df_banco, texto='Aperte aqui para baixar a tabela de Médias Totais em formato .csv'),
+                        unsafe_allow_html=True)
 
 
 if __name__ == '__main__':
