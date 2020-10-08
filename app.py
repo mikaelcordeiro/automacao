@@ -155,7 +155,7 @@ def dashboard():
 
             tabela  # colocar cor aqui
 
-            st.markdown(downloader(tabela, texto='Aperte aqui para baixar a tabela em formato .csv'),
+            st.markdown(downloader(tabela, texto='Aperte aqui para baixar a Tabela de Progresso em formato .csv'),
                         unsafe_allow_html=True)
 
             st.subheader('Tabela de Médias Totais e Evolução das semanas analisadas')
@@ -166,7 +166,7 @@ def dashboard():
 
             df_banco = banco.gerar_df()
 
-            df_banco  # colocar cor aqui
+            df_banco
 
             st.markdown(downloader(df_banco, texto='Aperte aqui para baixar a tabela de Médias Totais em formato .csv'),
                         unsafe_allow_html=True)
