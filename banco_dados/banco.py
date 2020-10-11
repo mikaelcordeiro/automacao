@@ -45,19 +45,7 @@ def gerar_df() -> pd.DataFrame:
 
     df_banco = pd.DataFrame(cursor.fetchall(), columns=colunas_banco).drop(columns=['ID']).set_index('Aluno')
 
-    try:
-
-        df_banco['Evolucao'] = (df_banco[colunas_banco[-1]] / df_banco[colunas_banco[-2]]) - 1
-
-    except:
-
-        with st.spinner('Teremos o indicador "Evolução" quando mais de um intervalo de dias for analisado :wink:'):
-
-            time.sleep(1.3)
-
-    finally:
-
-        return df_banco
+    return df_banco
 
 
 def adiciona_media_geral(media_total: list, data_inicial, data_final):
