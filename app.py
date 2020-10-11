@@ -220,7 +220,7 @@ def dashboard():
 
                 df_evolucao
 
-                st.markdown(downloader(df_evolucao,
+                st.markdown(downloader(df_evolucao['Evolucao'],
                                        texto='Aperte aqui para baixar a tabela de Evolução em formato .csv'),
                             unsafe_allow_html=True)
 
