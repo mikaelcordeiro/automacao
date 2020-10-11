@@ -75,6 +75,44 @@ def resumo_disciplinas(dados: pd.DataFrame) -> pd.DataFrame:
     return tabela
 
 
+def evolucao(dados: pd.DataFrame) -> pd.DataFrame:
+    st.warning('Escolha o intervalo mais recente primeiro :wink:')
+
+    escolhas = st.multiselect('Escolha DOIS intervalos de datas:', dados.columns)
+
+    if len(escolhas) > 1:
+
+        df_evolucao = dados[escolhas]
+
+        df_evolucao['Evolucao'] = df_evolucao[escolhas[1]] - df_evolucao[escolhas[0]]
+
+        return df_evolucao
+
+
+def melhora_piora(dados: pd.DataFrame) -> pd.DataFrame:
+    n_alunos_melhoraram = []
+
+    n_alunos_pioraram = []
+
+    for i in range(dados.columns.size):
+
+        if i == 0:
+
+            n_alunos_melhoraram.append('-')
+
+            n_alunos_pioraram.append('-')
+
+        else:
+
+            n_alunos_melhoraram.append(dados[dados.iloc[:, i] > dados.iloc[:, i - 1]].shape[0])
+
+            n_alunos_pioraram.append(dados[dados.iloc[:, i] < dados.iloc[:, i - 1]].shape[0])
+
+    return pd.DataFrame(columns=dados.columns,
+                 data=[n_alunos_melhoraram, n_alunos_pioraram],
+                 index=['Número de alunos que MELHORARAM', 'Número de alunos que PIORARAM'])
+
+
 def downloader(df: pd.DataFrame, texto: str):
     csv = df.to_csv(index=True)
     b64 = base64.b64encode(csv.encode()).decode()
@@ -158,18 +196,33 @@ def dashboard():
             st.markdown(downloader(tabela, texto='Aperte aqui para baixar a Tabela de Progresso em formato .csv'),
                         unsafe_allow_html=True)
 
-            st.subheader('Tabela de Médias Totais e Evolução das semanas analisadas')
-
             banco.producao_banco(media_total=tabela['Média Total'].tolist()[:-2], alunos=df['Aluno'].unique().tolist())
 
             banco.adiciona_media_geral(media_total=tabela['Média Total'].tolist()[:-2], data_inicial=data_zero, data_final=data_um)
 
-            df_banco = banco.gerar_df()
+            df_banco = banco.gerar_df()  # tabela crua que veio do banco de dados
 
-            df_banco
+            tabela_tres = melhora_piora(dados=df_banco)
 
-            st.markdown(downloader(df_banco, texto='Aperte aqui para baixar a tabela de Médias Totais em formato .csv'),
+            st.subheader('Gráfico de Médias Totais das semanas analisadas')
+
+            df_banco  #  aqui vem o gráfico, e vai usar esse df
+
+            st.markdown(downloader(df_banco.append(tabela_tres),
+                                   texto='Aperte aqui para baixar a tabela de Médias Totais em formato .csv'),
                         unsafe_allow_html=True)
+
+            st.subheader('Tabela de Médias Totais e Evolução das semanas escolhidas')
+
+            df_evolucao = evolucao(dados=df_banco)
+
+            if st.button('Ok'):
+
+                df_evolucao
+
+                st.markdown(downloader(df_evolucao,
+                                       texto='Aperte aqui para baixar a tabela de Evolução em formato .csv'),
+                            unsafe_allow_html=True)
 
 
 if __name__ == '__main__':
