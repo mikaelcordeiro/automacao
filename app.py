@@ -1,4 +1,3 @@
-import time
 import base64
 import streamlit as st
 import pandas as pd
@@ -26,14 +25,6 @@ def list_date(label):
 
 def date_datetime(date):
     return pd.to_datetime(date, errors='coerce', format='%d/%m/%Y')
-
-
-def progresso(tempo=.13):
-    bar = st.sidebar.progress(0)
-
-    for i in range(100):
-        bar.progress(i + 1)
-        time.sleep(tempo)
 
 
 def daterange(date1, date2):
@@ -87,6 +78,11 @@ def evolucao(dados: pd.DataFrame) -> pd.DataFrame:
         df_evolucao['Evolucao'] = df_evolucao[escolhas[1]] - df_evolucao[escolhas[0]]
 
         return df_evolucao
+
+
+def grafico(dados: pd.DataFrame, aluno: str) -> pd.DataFrame:
+
+    return dados.loc[aluno, :]
 
 
 def melhora_piora(dados: pd.DataFrame) -> pd.DataFrame:
@@ -145,8 +141,6 @@ def dashboard():
 
         df = leitura(file)
 
-        #        progresso()
-
         datas = retirando_datas(df['Conteúdo'])
 
         df = df.join(datas)
@@ -191,7 +185,7 @@ def dashboard():
 
             tabela = tabela.append(tabela_dois.iloc[:, :])
 
-            tabela  # colocar cor aqui
+            tabela
 
             st.markdown(downloader(tabela, texto='Aperte aqui para baixar a Tabela de Progresso em formato .csv'),
                         unsafe_allow_html=True)
@@ -206,7 +200,9 @@ def dashboard():
 
             st.subheader('Gráfico de Médias Totais das semanas analisadas')
 
-            df_banco  #  aqui vem o gráfico, e vai usar esse df
+            escolhido = st.selectbox('Escolha um aluno', df_banco.index)
+
+            st.line_chart(grafico(df_banco, escolhido))
 
             st.markdown(downloader(df_banco.append(tabela_tres),
                                    texto='Aperte aqui para baixar a tabela de Médias Totais em formato .csv'),
@@ -216,13 +212,13 @@ def dashboard():
 
             df_evolucao = evolucao(dados=df_banco)
 
-            if st.button('Ok'):
+            if st.button('Gerar Coluna Evolução'):
 
                 df_evolucao
 
                 st.markdown(downloader(df_evolucao['Evolucao'],
-                                       texto='Aperte aqui para baixar a tabela de Evolução em formato .csv'),
-                            unsafe_allow_html=True)
+                                           texto='Aperte aqui para baixar a tabela de Evolução em formato .csv'),
+                                unsafe_allow_html=True)
 
 
 if __name__ == '__main__':
