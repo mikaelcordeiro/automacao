@@ -1,2 +1,3 @@
 .idea/
-automacao/banco_dados/
+*/banco_dados/__pycache__/*
+*/banco_dados/teste.db
