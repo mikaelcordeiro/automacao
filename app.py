@@ -1,4 +1,5 @@
 import base64
+import time
 import streamlit as st
 import pandas as pd
 from banco_dados import banco
@@ -71,13 +72,19 @@ def evolucao(dados: pd.DataFrame) -> pd.DataFrame:
 
     escolhas = st.multiselect('Escolha DOIS intervalos de datas:', dados.columns)
 
-    if len(escolhas) > 1:
+    if len(escolhas) == 2:
 
         df_evolucao = dados[escolhas]
 
         df_evolucao['Evolucao'] = df_evolucao[escolhas[1]] - df_evolucao[escolhas[0]]
 
         return df_evolucao
+
+    else:
+
+        with st.spinner(f'{len(escolhas)} intervalo escolhido, faltam {2 - len(escolhas)} :stuck_out_tongue:'):
+
+            time.sleep(1.3)
 
 
 def grafico(dados: pd.DataFrame, aluno: str) -> pd.DataFrame:
@@ -154,70 +161,69 @@ def dashboard():
 
         tipos_selecionados = tipos_de_atividade(df, disciplinas)
 
-        if st.button('Gerar Tabela'):
+        st.subheader(f'Tabela de Progresso entre as datas {data_zero} - {data_um}')
 
-            st.subheader(f'Tabela de Progresso entre as datas {data_zero} - {data_um}')
+        tabela = pd.DataFrame(index=df['Aluno'].unique())
 
-            tabela = pd.DataFrame(index=df['Aluno'].unique())
+        for materia in tipos_selecionados.keys():
 
-            for materia in tipos_selecionados.keys():
+            notas = list()
 
-                notas = list()
+            for aluno in df['Aluno'].unique():
 
-                for aluno in df['Aluno'].unique():
+                medias_do_aluno = list()
 
-                    medias_do_aluno = list()
+                for selecionado in tipos_selecionados[materia]:
 
-                    for selecionado in tipos_selecionados[materia]:
-                        media = df[(df['Caderno'] == materia)
-                                   & (df['Tipo do conteúdo'] == selecionado)
-                                   & (df['Aluno'] == aluno)]['Progresso'].mean()
+                    media = df[(df['Caderno'] == materia)
+                               & (df['Tipo do conteúdo'] == selecionado)
+                               & (df['Aluno'] == aluno)]['Progresso'].mean()
 
-                        medias_do_aluno.append(media)
+                    medias_do_aluno.append(media)
 
-                    notas.append(max(medias_do_aluno))
+                notas.append(max(medias_do_aluno))
 
-                tabela[materia] = notas
+            tabela[materia] = notas
 
-            tabela['Média Total'] = tabela.mean(axis=1)
+        tabela['Média Total'] = tabela.mean(axis=1)
 
-            tabela_dois = resumo_disciplinas(tabela)
+        tabela_dois = resumo_disciplinas(tabela)
 
-            tabela = tabela.append(tabela_dois.iloc[:, :])
+        tabela = tabela.append(tabela_dois.iloc[:, :])
 
-            tabela
+        tabela
 
-            st.markdown(downloader(tabela, texto='Aperte aqui para baixar a Tabela de Progresso em formato .csv'),
-                        unsafe_allow_html=True)
+        st.markdown(downloader(tabela, texto='Aperte aqui para baixar a Tabela de Progresso em formato .csv'),
+                    unsafe_allow_html=True)
 
-            banco.producao_banco(media_total=tabela['Média Total'].tolist()[:-2], alunos=df['Aluno'].unique().tolist())
+        banco.producao_banco(media_total=tabela['Média Total'].tolist()[:-2], alunos=df['Aluno'].unique().tolist())
 
-            banco.adiciona_media_geral(media_total=tabela['Média Total'].tolist()[:-2], data_inicial=data_zero, data_final=data_um)
+        banco.adiciona_media_geral(media_total=tabela['Média Total'].tolist()[:-2], data_inicial=data_zero, data_final=data_um)
 
-            df_banco = banco.gerar_df()  # tabela crua que veio do banco de dados
+        df_banco = banco.gerar_df()  # tabela crua que veio do banco de dados
 
-            tabela_tres = melhora_piora(dados=df_banco)
+        tabela_tres = melhora_piora(dados=df_banco)
 
-            st.subheader('Gráfico de Médias Totais das semanas analisadas')
+        st.subheader('Gráfico de Médias Totais das semanas analisadas')
 
-            escolhido = st.selectbox('Escolha um aluno', df_banco.index)
+        escolhido = st.selectbox('Escolha um aluno', df_banco.index)
 
-            st.line_chart(grafico(df_banco, escolhido))
+        st.line_chart(grafico(df_banco, escolhido))
 
-            st.markdown(downloader(df_banco.append(tabela_tres),
+        st.markdown(downloader(df_banco.append(tabela_tres),
                                    texto='Aperte aqui para baixar a tabela de Médias Totais em formato .csv'),
                         unsafe_allow_html=True)
 
-            st.subheader('Tabela de Médias Totais e Evolução das semanas escolhidas')
+        st.subheader('Tabela de Médias Totais e Evolução das semanas escolhidas')
 
-            df_evolucao = evolucao(dados=df_banco)
+        df_evolucao = evolucao(dados=df_banco)
 
-            if st.button('Gerar Coluna Evolução'):
+        df_evolucao
 
-                df_evolucao
+        if df_evolucao is not None:
 
-                st.markdown(downloader(df_evolucao['Evolucao'],
-                                           texto='Aperte aqui para baixar a tabela de Evolução em formato .csv'),
+            st.markdown(downloader(df_evolucao['Evolucao'],
+                                           texto='Aperte aqui para baixar a coluna Evolução em formato .csv'),
                                 unsafe_allow_html=True)
 
 
