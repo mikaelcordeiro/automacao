@@ -17,20 +17,8 @@ def leitura(file):
     return df
 
 
-def list_date(label):
-    dates = st.sidebar.select_slider(label, options=[dt.strftime("%d/%m/%Y") for dt in
-                                                     daterange(date(2020, 2, 1), date(2020, 12, 31))])
-
-    return dates
-
-
 def date_datetime(date):
     return pd.to_datetime(date, errors='coerce', format='%d/%m/%Y')
-
-
-def daterange(date1, date2):
-    for n in range(int((date2 - date1).days) + 1):
-        yield date1 + timedelta(n)
 
 
 def retirando_datas(dataframe: pd.DataFrame):
@@ -76,7 +64,7 @@ def evolucao(dados: pd.DataFrame) -> pd.DataFrame:
 
         df_evolucao = dados[escolhas]
 
-        df_evolucao['Evolucao'] = df_evolucao[escolhas[1]] - df_evolucao[escolhas[0]]
+        df_evolucao['Evolucao'] = df_evolucao[escolhas[0]] - df_evolucao[escolhas[1]]
 
         return df_evolucao
 
@@ -134,13 +122,19 @@ def dashboard():
 
     st.sidebar.write('Escolha o intervalo de datas')
 
-    data_zero = list_date("Data Inicial")
+    data_zero = st.sidebar.date_input(label='Escolha a data inicial',
+                              value=date(2020, 2, 1),
+                              min_value=date(2020, 2, 1),
+                              max_value=date(2020, 12, 31))
 
-    data_um = list_date("Data Final")
+    data_um = st.sidebar.date_input(label='Escolha a data final',
+                              value=date(2020, 7, 1),
+                              min_value=date(2020, 2, 1),
+                              max_value=date(2020, 12, 31))
 
-    data_zero_datetime = date_datetime(data_zero)
+    data_zero_datetime = date_datetime(data_zero.strftime("%d/%m/%Y"))
 
-    data_um_datetime = date_datetime(data_um)
+    data_um_datetime = date_datetime(data_um.strftime("%d/%m/%Y"))
 
     file = st.sidebar.file_uploader('Arraste a planilha, ou clique em "browse files"')
 
