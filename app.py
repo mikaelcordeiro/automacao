@@ -208,7 +208,7 @@ def dashboard():
 
         escolhido = st.selectbox('Escolha um aluno', df_banco.index)
 
-        st.line_chart(grafico(df_banco, escolhido))
+        st.line_chart(grafico(df_banco, escolhido).dropna())
 
         st.markdown(downloader(df_banco.append(tabela_tres),
                                    texto='Aperte aqui para baixar a tabela de Médias Totais em formato .csv'),
@@ -218,9 +218,8 @@ def dashboard():
 
         df_evolucao = evolucao(dados=df_banco)
 
-        df_evolucao
-
         if df_evolucao is not None:
+            df_evolucao
 
             st.markdown(downloader(df_evolucao['Evolucao'],
                                            texto='Aperte aqui para baixar a coluna Evolução em formato .csv'),
