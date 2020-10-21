@@ -114,13 +114,13 @@ def downloader(df: pd.DataFrame, texto: str):
 def dashboard():
     config()
 
-    st.title('Associação Marie Curie Vestibulares')
+    st.image('imagens/principal.png', width=600)
 
-    'Dashboard para acompanhar o progresso dos alunos'
+    st.subheader('Dashboard para acompanhar o progresso dos alunos')
 
-    st.sidebar.subheader('Comece bem aqui a sua análise')
+    st.sidebar.image('imagens/logo_grande.png', use_column_width=True)
 
-    st.sidebar.write('Escolha o intervalo de datas')
+    st.sidebar.subheader('Escolha o intervalo de datas')
 
     data_zero = st.sidebar.date_input(label='Escolha a data inicial',
                               value=date(2020, 2, 1),
