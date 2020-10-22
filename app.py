@@ -3,7 +3,7 @@ import time
 import streamlit as st
 import pandas as pd
 from banco_dados import banco
-from datetime import timedelta, date
+from datetime import date
 
 
 def config():
@@ -185,7 +185,7 @@ def dashboard():
 
         tabela = tabela.append(tabela_dois.iloc[:, :])
 
-        tabela
+        st.dataframe(tabela)
 
         st.markdown(downloader(tabela, texto='Aperte aqui para baixar a Tabela de Progresso em formato .csv'),
                     unsafe_allow_html=True)
@@ -213,7 +213,7 @@ def dashboard():
         df_evolucao = evolucao(dados=df_banco)
 
         if df_evolucao is not None:
-            df_evolucao
+            st.dataframe(df_evolucao)
 
             st.markdown(downloader(df_evolucao['Evolucao'],
                                            texto='Aperte aqui para baixar a coluna Evolução em formato .csv'),
