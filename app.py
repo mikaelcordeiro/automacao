@@ -2,8 +2,9 @@ import base64
 import time
 import streamlit as st
 import pandas as pd
-from banco_dados import banco
+import numpy as np
 from datetime import date
+from banco_dados import banco
 
 
 def config():
@@ -190,11 +191,11 @@ def dashboard():
         st.markdown(downloader(tabela, texto='Aperte aqui para baixar a Tabela de Progresso em formato .csv'),
                     unsafe_allow_html=True)
 
-        banco.producao_banco(media_total=tabela['Média Total'].tolist()[:-2], alunos=df['Aluno'].unique().tolist())
+        banco.producao_banco(materias=df['Caderno'].unique().tolist(), alunos=df['Aluno'].unique().tolist())
 
         banco.adiciona_media_geral(media_total=tabela['Média Total'].tolist()[:-2], data_inicial=data_zero, data_final=data_um)
 
-        df_banco = banco.gerar_df()  # tabela crua que veio do banco de dados
+        df_banco = banco.gerar_df(coluna='medias_totais', indice='Aluno')  # tabela crua que veio do banco de dados
 
         tabela_tres = melhora_piora(dados=df_banco)
 
@@ -218,6 +219,26 @@ def dashboard():
             st.markdown(downloader(df_evolucao['Evolucao'],
                                            texto='Aperte aqui para baixar a coluna Evolução em formato .csv'),
                                 unsafe_allow_html=True)
+
+        st.subheader('Média de Acessos de Tipo de Material por Disciplinas')
+
+        ranking = df.query('`Status da seção` == "aberta"').pivot_table(values='Progresso',
+                                                                        index='Caderno',
+                                                                        columns='Tipo do conteúdo',
+                                                                        aggfunc='mean').replace({np.nan: 0}).round(4)
+
+        st.dataframe(ranking)
+
+        st.subheader('Gráfico de Evolução de Médias das Disciplinas')
+
+        banco.adiciona_media_disciplinas(medias_cadernos=df.groupby('Caderno').agg({'Progresso': 'mean'}).iloc[:, 0].tolist(),
+                                          data_final=data_um)
+
+        df_disciplinas = banco.gerar_df(coluna='cadernos', indice='Disciplinas')
+
+        disciplina = st.selectbox('Escolha uma Disciplina', df['Caderno'].unique().tolist())
+
+        #st.line_chart(grafico(df_disciplinas, disciplina))
 
 
 if __name__ == '__main__':
