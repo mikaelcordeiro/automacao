@@ -5,7 +5,7 @@ import pandas as pd
 
 
 def producao_banco(alunos: list, materias: list):
-    banco = sqlite3.connect('banco_dados/teste.db')
+    banco = sqlite3.connect('banco_dados/testando.db')
 
     cursor = banco.cursor()
 
@@ -59,7 +59,7 @@ def producao_banco(alunos: list, materias: list):
 
 
 def gerar_df(coluna: str, indice: str) -> pd.DataFrame:
-    banco = sqlite3.connect('banco_dados/teste.db')
+    banco = sqlite3.connect('banco_dados/testando.db')
 
     cursor = banco.cursor()
 
@@ -73,14 +73,14 @@ def gerar_df(coluna: str, indice: str) -> pd.DataFrame:
 
 
 def adiciona_media_geral(media_total: list, data_inicial, data_final):
-    banco = sqlite3.connect('banco_dados/teste.db')
+    banco = sqlite3.connect('banco_dados/testando.db')
 
     cursor = banco.cursor()
 
     try:
 
         cursor.execute(
-            f"""ALTER TABLE medias_totais ADD COLUMN '{data_inicial}-{data_final}' DECIMAL(1,4)""")
+            f"""ALTER TABLE medias_totais ADD COLUMN '{data_inicial} {data_final}' DECIMAL(1,4)""")
 
         for i, media in enumerate(media_total):
 
@@ -102,7 +102,7 @@ def adiciona_media_geral(media_total: list, data_inicial, data_final):
 
 
 def adiciona_media_disciplinas(medias_cadernos: pd.DataFrame, data_final):
-    banco = sqlite3.connect('banco_dados/teste.db')
+    banco = sqlite3.connect('banco_dados/testando.db')
 
     cursor = banco.cursor()
 
