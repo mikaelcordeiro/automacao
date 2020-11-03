@@ -35,7 +35,7 @@ def producao_banco(alunos: list, materias: list):
 
         with st.spinner('Alunos já preenchidos :smile:'):
 
-            time.sleep(1.3)
+            time.sleep(.8)
 
     finally:
 
@@ -51,7 +51,7 @@ def producao_banco(alunos: list, materias: list):
 
         with st.spinner('Alunos já preenchidos :smile:'):
 
-            time.sleep(1.3)
+            time.sleep(.8)
 
     finally:
 
@@ -94,7 +94,7 @@ def adiciona_media_geral(media_total: list, data_inicial, data_final):
 
         with st.spinner('Esse intervalo de datas já existe no banco de dados :stuck_out_tongue:'):
 
-            time.sleep(1.3)
+            time.sleep(.8)
 
     finally:
 
@@ -122,7 +122,7 @@ def adiciona_media_disciplinas(medias_cadernos: pd.DataFrame, data_final):
 
         with st.spinner('Esse intervalo de datas já existe no banco de dados :stuck_out_tongue:'):
 
-            time.sleep(1.3)
+            time.sleep(.8)
 
     finally:
 
