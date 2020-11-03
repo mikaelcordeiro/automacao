@@ -222,12 +222,21 @@ def dashboard():
 
         st.subheader('Média de Acessos de Tipo de Material por Disciplinas')
 
-        ranking = df.query('`Status da seção` == "aberta"').pivot_table(values='Progresso',
+        ranking_media = df.query('`Status da seção` == "aberta"').pivot_table(values='Progresso',
                                                                         index='Caderno',
                                                                         columns='Tipo do conteúdo',
                                                                         aggfunc='mean').replace({np.nan: 0}).round(4)
 
-        st.dataframe(ranking)
+        st.dataframe(ranking_media)
+
+        st.subheader('Número de Acessos de Tipo de Material por Disciplinas')
+
+        ranking_contagem = df.query('`Status da seção` == "aberta" and Progresso != 0').pivot_table(values='Progresso',
+                                                                        index='Caderno',
+                                                                        columns='Tipo do conteúdo',
+                                                                        aggfunc='count').replace({np.nan: 0}).round(4)
+
+        st.dataframe(ranking_contagem)
 
         st.subheader('Gráfico de Evolução de Médias das Disciplinas')
 
