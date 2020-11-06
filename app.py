@@ -247,7 +247,7 @@ def dashboard():
 
         disciplina = st.selectbox('Escolha uma Disciplina', df['Caderno'].unique().tolist())
 
-        st.line_chart(grafico(df_disciplinas, disciplina))
+        st.line_chart(grafico(df_disciplinas, disciplina).dropna())
 
 
 if __name__ == '__main__':
